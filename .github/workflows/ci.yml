@@ -12,7 +12,8 @@ permissions:
   contents: read
 
 jobs:
-  ci:
+  checks:
+    name: Lint, typecheck, format, build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,5 +25,25 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run format:check
-      - run: npm run test
       - run: npm run build
+
+  test:
+    # Date bugs only show up on one side of UTC, so run the suite on both.
+    name: Test (${{ matrix.tz }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        tz: [Asia/Singapore, America/New_York]
+    env:
+      TZ: ${{ matrix.tz }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Confirm timezone
+        run: node -e "const tz = Intl.DateTimeFormat().resolvedOptions().timeZone; console.log(tz); if (tz !== process.env.TZ) process.exit(1)"
+      - run: npm run test
