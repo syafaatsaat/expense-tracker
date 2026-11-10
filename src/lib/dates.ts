@@ -68,3 +68,10 @@ export function addMonths(key: MonthKey, n: number): MonthKey {
 export function isInMonth(date: LocalDate, key: MonthKey): boolean {
   return monthKey(date) === key;
 }
+
+/** The given day (1 to 31) of a month, clamped to the month's last day: 31 → 30 Nov, 28/29 Feb. */
+export function dateInMonth(key: MonthKey, day: number): LocalDate {
+  if (!Number.isInteger(day) || day < 1 || day > 31) throw new RangeError(`Invalid day: ${day}`);
+  const [year, month] = splitMonthKey(key);
+  return `${key}-${pad2(Math.min(day, daysInMonth(year, month)))}` as LocalDate;
+}
