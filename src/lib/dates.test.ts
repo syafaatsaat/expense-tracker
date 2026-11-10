@@ -1,5 +1,6 @@
 import {
   addMonths,
+  dateInMonth,
   daysInMonth,
   isInMonth,
   isLocalDate,
@@ -124,5 +125,22 @@ describe('isInMonth', () => {
     expect(isInMonth('2026-10-31', '2026-11')).toBe(false);
     expect(isInMonth('2026-12-01', '2026-11')).toBe(false);
     expect(isInMonth('2025-11-15', '2026-11')).toBe(false);
+  });
+});
+
+describe('dateInMonth', () => {
+  it.each([
+    ['2026-11', 5, '2026-11-05'],
+    ['2026-11', 31, '2026-11-30'],
+    ['2026-02', 31, '2026-02-28'],
+    ['2028-02', 30, '2028-02-29'],
+    ['2026-03', 31, '2026-03-31'],
+    ['2026-01', 1, '2026-01-01'],
+  ] as const)('%s day %i is %s (clamped to month end)', (key, day, expected) => {
+    expect(dateInMonth(key, day)).toBe(expected);
+  });
+
+  it.each([0, 32, 1.5, Number.NaN])('rejects day %d', (day) => {
+    expect(() => dateInMonth('2026-11', day)).toThrow(RangeError);
   });
 });
