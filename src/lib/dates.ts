@@ -75,3 +75,39 @@ export function dateInMonth(key: MonthKey, day: number): LocalDate {
   const [year, month] = splitMonthKey(key);
   return `${key}-${pad2(Math.min(day, daysInMonth(year, month)))}` as LocalDate;
 }
+
+// Month names are fixed English receipt codes, not Intl output: en-SG abbreviates
+// September as "Sept", and the design needs three letters.
+const MONTH_NAMES = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+] as const;
+
+function monthName(key: MonthKey): string {
+  return MONTH_NAMES[splitMonthKey(key)[1] - 1] ?? '';
+}
+
+/** Three-letter code, e.g. "NOV". */
+export function monthCode(key: MonthKey): string {
+  return monthName(key).slice(0, 3).toUpperCase();
+}
+
+/** Receipt-style label, e.g. "NOV 2026". */
+export function formatMonthShort(key: MonthKey): string {
+  return `${monthCode(key)} ${key.slice(0, 4)}`;
+}
+
+/** Spoken label, e.g. "November 2026". */
+export function formatMonthLong(key: MonthKey): string {
+  return `${monthName(key)} ${key.slice(0, 4)}`;
+}
