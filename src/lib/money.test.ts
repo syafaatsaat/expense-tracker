@@ -1,4 +1,10 @@
-import { centsToDecimalString, formatCents, MAX_AMOUNT_CENTS, parseAmount } from './money.ts';
+import {
+  centsToDecimalString,
+  formatAmount,
+  formatCents,
+  MAX_AMOUNT_CENTS,
+  parseAmount,
+} from './money.ts';
 
 describe('parseAmount', () => {
   it.each([
@@ -67,11 +73,11 @@ describe('parseAmount', () => {
 
 describe('formatCents', () => {
   it.each([
-    [1250, '$12.50'],
-    [0, '$0.00'],
-    [5, '$0.05'],
-    [123456789, '$1,234,567.89'],
-    [-1250, '-$12.50'],
+    [1250, 'S$12.50'],
+    [0, 'S$0.00'],
+    [5, 'S$0.05'],
+    [123456789, 'S$1,234,567.89'],
+    [-1250, '-S$12.50'],
   ])('formats %i as %j', (cents, text) => {
     expect(formatCents(cents)).toBe(text);
   });
@@ -79,6 +85,22 @@ describe('formatCents', () => {
   it('throws on non-integer cents instead of hiding a bug', () => {
     expect(() => formatCents(12.5)).toThrow(RangeError);
     expect(() => formatCents(Number.NaN)).toThrow(RangeError);
+  });
+});
+
+describe('formatAmount', () => {
+  it.each([
+    [1250, '12.50'],
+    [0, '0.00'],
+    [50000, '500.00'],
+    [123456789, '1,234,567.89'],
+    [-1250, '-12.50'],
+  ])('formats %i as %j, grouped and without a symbol', (cents, text) => {
+    expect(formatAmount(cents)).toBe(text);
+  });
+
+  it('throws on non-integer cents', () => {
+    expect(() => formatAmount(0.5)).toThrow(RangeError);
   });
 });
 

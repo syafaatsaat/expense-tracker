@@ -1,10 +1,13 @@
 import {
   addMonths,
   dateInMonth,
+  formatMonthLong,
+  formatMonthShort,
   daysInMonth,
   isInMonth,
   isLocalDate,
   isMonthKey,
+  monthCode,
   monthKey,
   monthRange,
   toLocalDate,
@@ -142,5 +145,18 @@ describe('dateInMonth', () => {
 
   it.each([0, 32, 1.5, Number.NaN])('rejects day %d', (day) => {
     expect(() => dateInMonth('2026-11', day)).toThrow(RangeError);
+  });
+});
+
+describe('month labels', () => {
+  it.each([
+    ['2026-01', 'JAN', 'JAN 2026', 'January 2026'],
+    ['2026-09', 'SEP', 'SEP 2026', 'September 2026'],
+    ['2026-11', 'NOV', 'NOV 2026', 'November 2026'],
+    ['2027-12', 'DEC', 'DEC 2027', 'December 2027'],
+  ] as const)('%s is %s / %s / %s', (key, code, short, long) => {
+    expect(monthCode(key)).toBe(code);
+    expect(formatMonthShort(key)).toBe(short);
+    expect(formatMonthLong(key)).toBe(long);
   });
 });

@@ -1,4 +1,4 @@
-import { CURRENCY, LOCALE } from '../config.ts';
+import { CURRENCY, CURRENCY_SYMBOL, LOCALE } from '../config.ts';
 
 /** Largest accepted amount: $999,999.99. */
 export const MAX_AMOUNT_CENTS = 99_999_999;
@@ -45,10 +45,24 @@ function assertCents(cents: number): void {
   if (!Number.isSafeInteger(cents)) throw new RangeError(`Expected integer cents, got ${cents}`);
 }
 
-/** Formats cents for display, e.g. 1250 → "$12.50". The only currency formatter in the app. */
-export function formatCents(cents: number): string {
+function parts(cents: number): Intl.NumberFormatPart[] {
   assertCents(cents);
-  return formatter.format(cents / 100);
+  return formatter.formatToParts(cents / 100);
+}
+
+/** Formats cents for display, e.g. 1250 → "S$12.50". All money display goes through this file. */
+export function formatCents(cents: number): string {
+  return parts(cents)
+    .map((p) => (p.type === 'currency' ? CURRENCY_SYMBOL : p.value))
+    .join('');
+}
+
+/** Grouped amount without a symbol, for receipt lines and SAVED: 50000 → "500.00". */
+export function formatAmount(cents: number): string {
+  return parts(cents)
+    .filter((p) => p.type !== 'currency' && p.type !== 'literal')
+    .map((p) => p.value)
+    .join('');
 }
 
 /** Plain decimal string with no symbol or grouping, e.g. 1250 → "12.50". For inputs and CSV. */
