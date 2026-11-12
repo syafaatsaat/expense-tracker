@@ -1,1 +1,88 @@
 @import 'tailwindcss';
+
+/* Till design tokens (see Till-design-hand-off.md). Tailwind's default palette is
+   switched off so only these colours exist. */
+@theme {
+  --color-*: initial;
+  --color-desk: #4a4639;
+  --color-desk-dither: #423f33;
+  --color-ink: #24221d;
+  --color-ink-deep: #141310;
+  --color-ink-edge: #0a0907;
+  --color-key: #36332b;
+  --color-paper: #e6dec6;
+  --color-paper-side: #b9b096;
+  --color-muted: #5e5847;
+  --color-olive: #a9ae93;
+  --color-light: #ede6cf;
+  --color-red: #a8402e;
+  --color-red-on-dark: #e0735e;
+  /* In-between shades the canvas uses on the dark card. */
+  --color-rule-on-ink: #4e4a3e;
+  --color-locked-on-ink: #6f6a58;
+
+  --font-pixel: 'Silkscreen', ui-monospace, monospace;
+  --font-receipt: 'VT323', ui-monospace, monospace;
+
+  /* Silkscreen only at multiples of 8px, or the pixels blur. */
+  --text-pixel-8: 8px;
+  --text-pixel-8--line-height: 8px;
+  --text-pixel-16: 16px;
+  --text-pixel-16--line-height: 16px;
+  /* VT323: lines and body, then big totals. */
+  --text-line: 20px;
+  --text-line--line-height: 1;
+  --text-total: 48px;
+  --text-total--line-height: 0.9;
+  --text-total-lg: 52px;
+  --text-total-lg--line-height: 0.9;
+}
+
+@layer base {
+  html {
+    background-color: var(--color-desk);
+  }
+
+  body {
+    font-family: var(--font-receipt);
+    color: var(--color-ink);
+  }
+
+  /* 3px dashed focus ring, offset 4px. Red on paper; the lighter red on dark surfaces,
+     where plain red is under 3:1 (2.6:1 on ink, 1.6:1 on the desk). */
+  :focus-visible {
+    outline: 3px dashed var(--focus-ring, var(--color-red));
+    outline-offset: 4px;
+  }
+}
+
+@layer components {
+  .desk {
+    --focus-ring: var(--color-red-on-dark);
+    background-color: var(--color-desk);
+    background-image: repeating-conic-gradient(var(--color-desk-dither) 0 25%, transparent 0 50%);
+    background-size: 4px 4px;
+  }
+
+  .hard-shadow {
+    box-shadow: 6px 6px 0 0 rgb(0 0 0 / 0.3);
+  }
+
+  .dark-card {
+    --focus-ring: var(--color-red-on-dark);
+    background-color: var(--color-ink);
+    color: var(--color-light);
+    box-shadow:
+      0 -3px 0 0 var(--color-ink-deep),
+      0 3px 0 0 var(--color-ink-deep),
+      -3px 0 0 0 var(--color-ink-deep),
+      3px 0 0 0 var(--color-ink-deep),
+      0 9px 0 0 rgb(0 0 0 / 0.3);
+  }
+
+  .paper {
+    --focus-ring: var(--color-red);
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+  }
+}
