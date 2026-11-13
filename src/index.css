@@ -20,6 +20,8 @@
   /* In-between shades the canvas uses on the dark card. */
   --color-rule-on-ink: #4e4a3e;
   --color-locked-on-ink: #6f6a58;
+  /* Square-dot leader on receipt lines. */
+  --color-leader: #8c846c;
 
   --font-pixel: 'Silkscreen', ui-monospace, monospace;
   --font-receipt: 'VT323', ui-monospace, monospace;
@@ -32,6 +34,8 @@
   /* VT323: lines and body, then big totals. */
   --text-line: 20px;
   --text-line--line-height: 1;
+  --text-footer: 28px;
+  --text-footer--line-height: 1;
   --text-total: 48px;
   --text-total--line-height: 0.9;
   --text-total-lg: 52px;
@@ -84,5 +88,11 @@
     --focus-ring: var(--color-red);
     background-color: var(--color-paper);
     color: var(--color-ink);
+  }
+
+  /* Square-dot leader between a line's description and its amount. */
+  .leader {
+    height: 2px;
+    background: repeating-linear-gradient(90deg, var(--color-leader) 0 2px, transparent 2px 6px);
   }
 }
