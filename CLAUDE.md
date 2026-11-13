@@ -30,13 +30,13 @@ React + TypeScript (strict) + Vite, Tailwind, Vitest + Testing Library, Playwrig
 - Delete is instant, with an undo toast of about 5 s. No confirm dialogs, except for reset and import.
 
 ## Design (Till)
-- Tokens live in `src/index.css` (`@theme`): the 13 hand-off colours only; Tailwind's default palette is off. Silkscreen sizes are multiples of 8px only (`text-pixel-8`, `text-pixel-16`); VT323 for lines and totals.
+- Tokens live in `src/index.css` (`@theme`): the 13 hand-off colours plus the few canvas-only shades listed there; Tailwind's default palette is off. Silkscreen sizes are multiples of 8px only (`text-pixel-8`, `text-pixel-16`); VT323 for lines and totals.
 - One theme. Dark mode is dropped (the desk is already dark).
 - Categories show as pixel icon + name. The per-category palette colours in `categories.ts` are not used and go when the department keys are built.
 - Changes to apply in the phase that builds each feature:
   - First launch shows an empty receipt with "Load sample month"; no automatic seeding.
-  - Max amount S$99,999.99 (7 digits; the keypad fills from the right). Description max 40 characters; empty uses the department name.
   - Delete is VOID on the edit screen, with Undo. Cancel asks "Discard this line?" / "Discard changes?" only when something changed.
+- Max amount S$99,999.99 (`MAX_AMOUNT_CENTS`; the keypad holds 7 digits and fills from the right). Description max 40 characters; empty prints the department name.
 - Touch targets at least 44px, even where the canvas draws 40px.
 - Focus ring: 3px dashed, offset 4px; red on paper, red-on-dark on dark surfaces (plain red is under 3:1 there).
 
