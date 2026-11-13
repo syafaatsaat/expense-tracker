@@ -4,6 +4,7 @@ import { summarize } from './domain/totals.ts';
 import type { LocalDate, MonthKey } from './domain/types.ts';
 import { monthKey } from './lib/dates.ts';
 import { AppShell } from './shell/AppShell.tsx';
+import { Receipt } from './receipt/Receipt.tsx';
 import { Header } from './shell/Header.tsx';
 import type { LoadResult } from './storage/repository.ts';
 
@@ -32,11 +33,16 @@ export default function App({ today, loaded }: AppProps) {
     };
   }, [loaded]);
 
+  const monthLines = useMemo(
+    () => (data.status === 'ready' ? filterExpenses(data.root.expenses, { month }) : null),
+    [data, month],
+  );
+
   const totals = useMemo(() => {
-    if (data.status !== 'ready') return null;
-    const { spentCents, savedCents } = summarize(filterExpenses(data.root.expenses, { month }));
+    if (!monthLines) return null;
+    const { spentCents, savedCents } = summarize(monthLines);
     return { spentCents, savedCents };
-  }, [data, month]);
+  }, [monthLines]);
 
   const unreadable = data.status === 'corrupt' || data.status === 'failed';
 
@@ -59,21 +65,32 @@ export default function App({ today, loaded }: AppProps) {
         ) : null
       }
       receipt={
-        <>
-          {/* Printer slot: the receipt feeds out of here in the next phase. */}
-          <div className="relative z-10 -mx-[3px] h-2 bg-ink-deep" />
-          {unreadable ? (
-            <section className="paper hard-shadow mx-[7px] flex flex-col gap-2 px-4 pt-[18px] pb-4">
-              <h2 className="font-pixel text-pixel-16 text-red">
-                Can&apos;t read your saved lines
-              </h2>
-              <p className="text-line">
-                The data in this browser couldn&apos;t be loaded. Nothing has been changed or
-                deleted.
-              </p>
-            </section>
-          ) : null}
-        </>
+        monthLines && totals ? (
+          <Receipt
+            key={month}
+            month={month}
+            currentMonth={currentMonth}
+            expenses={monthLines}
+            totals={totals}
+            onBackToCurrent={() => setMonth(currentMonth)}
+          />
+        ) : (
+          <>
+            {/* Printer slot, empty until the data has loaded. */}
+            <div aria-hidden="true" className="relative z-10 -mx-[3px] h-2 bg-ink-deep" />
+            {unreadable ? (
+              <section className="paper hard-shadow mx-[7px] flex flex-col gap-2 px-4 pt-[18px] pb-4">
+                <h2 className="font-pixel text-pixel-16 text-red">
+                  Can&apos;t read your saved lines
+                </h2>
+                <p className="text-line">
+                  The data in this browser couldn&apos;t be loaded. Nothing has been changed or
+                  deleted.
+                </p>
+              </section>
+            ) : null}
+          </>
+        )
       }
     />
   );
