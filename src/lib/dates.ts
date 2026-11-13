@@ -65,6 +65,33 @@ export function addMonths(key: MonthKey, n: number): MonthKey {
   return `${pad4(Math.floor(index / 12))}-${pad2((index % 12) + 1)}` as MonthKey;
 }
 
+/** Last day of a month, e.g. "2026-11-30". */
+export function lastDayOfMonth(key: MonthKey): LocalDate {
+  return monthRange(key).end;
+}
+
+/**
+ * Moves a date forwards (positive n) or backwards (negative n) by whole days, stepping
+ * through the calendar fields so no Date or timezone is involved.
+ */
+export function addDays(date: LocalDate, n: number): LocalDate {
+  if (!Number.isInteger(n)) throw new RangeError(`Invalid day count: ${n}`);
+  let year = Number(date.slice(0, 4));
+  let month = Number(date.slice(5, 7));
+  let day = Number(date.slice(8, 10)) + n;
+  while (day < 1) {
+    month -= 1;
+    if (month < 1) [year, month] = [year - 1, 12];
+    day += daysInMonth(year, month);
+  }
+  while (day > daysInMonth(year, month)) {
+    day -= daysInMonth(year, month);
+    month += 1;
+    if (month > 12) [year, month] = [year + 1, 1];
+  }
+  return `${pad4(year)}-${pad2(month)}-${pad2(day)}` as LocalDate;
+}
+
 export function isInMonth(date: LocalDate, key: MonthKey): boolean {
   return monthKey(date) === key;
 }
@@ -155,4 +182,9 @@ export function formatDayLong(date: LocalDate): string {
 /** Receipt number for a month, e.g. "10/2026". */
 export function formatReceiptNumber(key: MonthKey): string {
   return `${key.slice(5, 7)}/${key.slice(0, 4)}`;
+}
+
+/** Blank cells before the 1st in a Monday-first calendar: 0 when the month starts on a Monday. */
+export function mondayOffset(key: MonthKey): number {
+  return (weekdayIndex(`${key}-01` as LocalDate) + 6) % 7;
 }

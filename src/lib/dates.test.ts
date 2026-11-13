@@ -1,4 +1,5 @@
 import {
+  addDays,
   addMonths,
   dateInMonth,
   formatDayHeader,
@@ -10,6 +11,8 @@ import {
   isInMonth,
   isLocalDate,
   isMonthKey,
+  lastDayOfMonth,
+  mondayOffset,
   monthCode,
   monthKey,
   monthRange,
@@ -194,5 +197,46 @@ describe('day and receipt labels', () => {
   it('formats the receipt number as MM/YYYY', () => {
     expect(formatReceiptNumber('2026-10')).toBe('10/2026');
     expect(formatReceiptNumber('2027-01')).toBe('01/2027');
+  });
+});
+
+describe('addDays', () => {
+  it.each([
+    ['2026-11-13', -1, '2026-11-12'],
+    ['2026-11-01', -1, '2026-10-31'],
+    ['2026-01-01', -1, '2025-12-31'],
+    ['2024-02-28', 1, '2024-02-29'],
+    ['2024-02-29', 1, '2024-03-01'],
+    ['2026-02-28', 1, '2026-03-01'],
+    ['2026-12-31', 1, '2027-01-01'],
+    ['2026-11-13', 0, '2026-11-13'],
+    ['2026-11-13', 30, '2026-12-13'],
+    ['2026-03-01', -365, '2025-03-01'],
+  ] as const)('%s plus %i days is %s', (date, n, expected) => {
+    expect(addDays(date, n)).toBe(expected);
+  });
+});
+
+describe('lastDayOfMonth', () => {
+  it.each([
+    ['2026-11', '2026-11-30'],
+    ['2026-10', '2026-10-31'],
+    ['2024-02', '2024-02-29'],
+    ['2026-02', '2026-02-28'],
+  ] as const)('%s ends on %s', (key, expected) => {
+    expect(lastDayOfMonth(key)).toBe(expected);
+  });
+});
+
+describe('mondayOffset', () => {
+  // Blank cells before the 1st in a Monday-first calendar.
+  it.each([
+    ['2026-11', 6], // Sun 1 Nov
+    ['2026-10', 3], // Thu 1 Oct
+    ['2026-06', 0], // Mon 1 Jun
+    ['2026-09', 1], // Tue 1 Sep
+    ['2024-02', 3], // Thu 1 Feb
+  ] as const)('%s has %i leading blanks', (key, expected) => {
+    expect(mondayOffset(key)).toBe(expected);
   });
 });
