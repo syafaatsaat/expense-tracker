@@ -1,8 +1,11 @@
 import {
   addMonths,
   dateInMonth,
+  formatDayHeader,
+  formatDayLong,
   formatMonthLong,
   formatMonthShort,
+  formatReceiptNumber,
   daysInMonth,
   isInMonth,
   isLocalDate,
@@ -11,6 +14,7 @@ import {
   monthKey,
   monthRange,
   toLocalDate,
+  weekdayCode,
 } from './dates.ts';
 
 describe('toLocalDate', () => {
@@ -158,5 +162,37 @@ describe('month labels', () => {
     expect(monthCode(key)).toBe(code);
     expect(formatMonthShort(key)).toBe(short);
     expect(formatMonthLong(key)).toBe(long);
+  });
+});
+
+describe('weekdayCode', () => {
+  it.each([
+    ['2026-11-10', 'TUE'],
+    ['2026-11-08', 'SUN'],
+    ['2026-11-14', 'SAT'],
+    ['2024-02-29', 'THU'],
+    ['2000-01-01', 'SAT'],
+    ['1999-12-31', 'FRI'],
+    ['2027-01-04', 'MON'],
+    ['2026-12-30', 'WED'],
+  ] as const)('%s is a %s', (date, code) => {
+    expect(weekdayCode(date)).toBe(code);
+  });
+});
+
+describe('day and receipt labels', () => {
+  it('formats a day header like a receipt', () => {
+    expect(formatDayHeader('2026-11-10')).toBe('TUE 10 NOV');
+    expect(formatDayHeader('2026-10-05')).toBe('MON 05 OCT');
+  });
+
+  it('formats the day in full for screen readers', () => {
+    expect(formatDayLong('2026-11-10')).toBe('Tuesday 10 November');
+    expect(formatDayLong('2026-10-05')).toBe('Monday 5 October');
+  });
+
+  it('formats the receipt number as MM/YYYY', () => {
+    expect(formatReceiptNumber('2026-10')).toBe('10/2026');
+    expect(formatReceiptNumber('2027-01')).toBe('01/2027');
   });
 });

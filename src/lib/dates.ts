@@ -111,3 +111,48 @@ export function formatMonthShort(key: MonthKey): string {
 export function formatMonthLong(key: MonthKey): string {
   return `${monthName(key)} ${key.slice(0, 4)}`;
 }
+
+const WEEKDAY_NAMES = [
+  'Sunday',
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+] as const;
+
+// Sakamoto's method: the weekday from the calendar fields alone, so no Date and no timezone.
+const SAKAMOTO = [0, 3, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4] as const;
+
+function weekdayIndex(date: LocalDate): number {
+  const month = Number(date.slice(5, 7));
+  const day = Number(date.slice(8, 10));
+  const year = Number(date.slice(0, 4)) - (month < 3 ? 1 : 0);
+  const offset = SAKAMOTO[month - 1] ?? 0;
+  return (
+    (year + Math.floor(year / 4) - Math.floor(year / 100) + Math.floor(year / 400) + offset + day) %
+    7
+  );
+}
+
+/** Three-letter weekday, e.g. "TUE". */
+export function weekdayCode(date: LocalDate): string {
+  return (WEEKDAY_NAMES[weekdayIndex(date)] ?? '').slice(0, 3).toUpperCase();
+}
+
+/** Receipt day header, e.g. "TUE 10 NOV". */
+export function formatDayHeader(date: LocalDate): string {
+  return `${weekdayCode(date)} ${date.slice(8, 10)} ${monthCode(monthKey(date))}`;
+}
+
+/** Spoken day, e.g. "Tuesday 10 November". */
+export function formatDayLong(date: LocalDate): string {
+  const weekday = WEEKDAY_NAMES[weekdayIndex(date)] ?? '';
+  return `${weekday} ${Number(date.slice(8, 10))} ${monthName(monthKey(date))}`;
+}
+
+/** Receipt number for a month, e.g. "10/2026". */
+export function formatReceiptNumber(key: MonthKey): string {
+  return `${key.slice(5, 7)}/${key.slice(0, 4)}`;
+}
