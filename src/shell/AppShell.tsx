@@ -9,6 +9,8 @@ interface AppShellProps {
   receipt: ReactNode;
   /** Chart and category shares. Omitted until that phase. */
   side?: ReactNode;
+  /** The phone's ADD LINE button, fixed to the bottom of the screen. */
+  action?: ReactNode;
 }
 
 /**
@@ -16,7 +18,7 @@ interface AppShellProps {
  * (entry, receipt) from 1024px with the side panel under the entry column; three
  * columns from 1280px, as on the desktop canvas.
  */
-export function AppShell({ header, notice, entry, receipt, side }: AppShellProps) {
+export function AppShell({ header, notice, entry, receipt, side, action }: AppShellProps) {
   return (
     <div className="desk min-h-dvh">
       <a
@@ -25,7 +27,9 @@ export function AppShell({ header, notice, entry, receipt, side }: AppShellProps
       >
         Skip to receipt
       </a>
-      <div className="mx-auto grid max-w-[560px] grid-cols-1 gap-[18px] px-[15px] pt-4 pb-10 lg:max-w-[1220px] lg:grid-cols-[minmax(320px,380px)_minmax(420px,1fr)] lg:gap-8 lg:px-6 lg:pt-7 xl:grid-cols-[minmax(320px,380px)_minmax(420px,1fr)_minmax(300px,340px)]">
+      <div
+        className={`mx-auto grid max-w-[560px] grid-cols-1 gap-[18px] px-[15px] pt-4 ${action ? 'pb-32' : 'pb-10'} lg:max-w-[1220px] lg:grid-cols-[minmax(320px,380px)_minmax(420px,1fr)] lg:gap-8 lg:px-6 lg:pt-7 xl:grid-cols-[minmax(320px,380px)_minmax(420px,1fr)_minmax(300px,340px)]`}
+      >
         <div className="flex min-w-0 flex-col gap-[22px] lg:col-start-1 lg:row-start-1">
           {header}
           {notice}
@@ -47,6 +51,11 @@ export function AppShell({ header, notice, entry, receipt, side }: AppShellProps
           </aside>
         ) : null}
       </div>
+      {action ? (
+        <div className="fixed inset-x-0 bottom-0 z-20 px-[15px] pb-[18px]">
+          <div className="mx-auto max-w-[530px]">{action}</div>
+        </div>
+      ) : null}
     </div>
   );
 }

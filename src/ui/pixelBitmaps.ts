@@ -127,6 +127,29 @@ export const PIXEL_BITMAPS = {
     '.........',
     '.........',
   ],
+  // Controls on the new-line card.
+  calendar: [
+    '.#.....#.',
+    '#########',
+    '#.......#',
+    '#########',
+    '#.#.#.#.#',
+    '#.......#',
+    '#.#.#.#.#',
+    '#.......#',
+    '#########',
+  ],
+  backspace: [
+    '...######',
+    '..#.....#',
+    '.#..#.#.#',
+    '#....#..#',
+    '.#..#.#.#',
+    '..#.....#',
+    '...######',
+  ],
+  plus: ['..##..', '..##..', '######', '######', '..##..', '..##..'],
+  alert: ['##', '##', '##', '##', '..', '##'],
 } as const satisfies Record<string, readonly string[]>;
 
 export type PixelIconName = keyof typeof PIXEL_BITMAPS;

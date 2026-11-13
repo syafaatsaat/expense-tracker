@@ -1,4 +1,4 @@
-import { CATEGORIES, getCategory, isSpendingCategory } from './categories.ts';
+import { CATEGORIES, KEY_ORDER, getCategory, isSpendingCategory } from './categories.ts';
 import { PIXEL_BITMAPS } from '../ui/pixelBitmaps.ts';
 import { CATEGORY_IDS } from './types.ts';
 
@@ -106,5 +106,24 @@ describe('isSpendingCategory', () => {
 
   it('counts Debts & loans as spending', () => {
     expect(isSpendingCategory('debts')).toBe(true);
+  });
+});
+
+describe('KEY_ORDER', () => {
+  it('lists every department once, as on the keys: spending first, savings last', () => {
+    expect([...KEY_ORDER].sort()).toEqual([...CATEGORY_IDS].sort());
+    expect(KEY_ORDER.map((id) => getCategory(id).code)).toEqual([
+      'HS',
+      'UT',
+      'FD',
+      'TR',
+      'HC',
+      'PC',
+      'IN',
+      'DL',
+      'EN',
+      'OT',
+      'SV',
+    ]);
   });
 });

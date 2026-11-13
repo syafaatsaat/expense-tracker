@@ -109,6 +109,12 @@ export const CATEGORIES: readonly Category[] = [
 const BY_ID = new Map(CATEGORIES.map((c) => [c.id, c]));
 const ORDER = new Map(CATEGORIES.map((c, i) => [c.id, i]));
 
+/** Department keys in the order printed on the till: spending departments, then savings. */
+export const KEY_ORDER: readonly CategoryId[] = [
+  ...CATEGORIES.filter((c) => c.kind === 'spending'),
+  ...CATEGORIES.filter((c) => c.kind === 'saving'),
+].map((c) => c.id);
+
 export function getCategory(id: CategoryId): Category {
   const category = BY_ID.get(id);
   if (!category) throw new Error(`Unknown category: ${id}`);

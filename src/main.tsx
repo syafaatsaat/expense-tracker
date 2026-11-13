@@ -16,6 +16,6 @@ const loaded = repository.load(today);
 
 createRoot(root).render(
   <StrictMode>
-    <App today={today} loaded={loaded} />
+    <App today={today} repository={repository} loaded={loaded} />
   </StrictMode>,
 );

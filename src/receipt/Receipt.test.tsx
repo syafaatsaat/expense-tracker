@@ -9,7 +9,12 @@ function renderReceipt(
   {
     month = '2026-11',
     totals = { spentCents: 0, savedCents: 0 },
-  }: { month?: MonthKey; totals?: { spentCents: number; savedCents: number } } = {},
+    fresh = null,
+  }: {
+    month?: MonthKey;
+    totals?: { spentCents: number; savedCents: number };
+    fresh?: { id: string; n: number } | null;
+  } = {},
 ) {
   const onBackToCurrent = vi.fn();
   render(
@@ -19,6 +24,7 @@ function renderReceipt(
       expenses={expenses}
       totals={totals}
       onBackToCurrent={onBackToCurrent}
+      fresh={fresh}
     />,
   );
   return { onBackToCurrent, user: userEvent.setup() };
@@ -130,6 +136,30 @@ describe('Receipt', () => {
       renderReceipt([]);
       expect(screen.queryByText('CLOSED')).not.toBeInTheDocument();
       expect(screen.queryByRole('button', { name: /back to/i })).not.toBeInTheDocument();
+    });
+  });
+
+  describe('a just-printed line', () => {
+    it('is marked new, for sight and for screen readers', () => {
+      renderReceipt(
+        [makeExpense({ id: 'a', note: 'Kopi' }), makeExpense({ id: 'b', note: 'Toast' })],
+        {
+          fresh: { id: 'b', n: 1 },
+        },
+      );
+      const items = screen.getAllByRole('listitem');
+      const toast = items.find((li) => li.textContent?.includes('Toast'));
+      const kopi = items.find((li) => li.textContent?.includes('Kopi'));
+      expect(toast).toHaveTextContent(/new line/i);
+      expect(within(toast!).getByText('NEW')).toBeInTheDocument();
+      expect(kopi).not.toHaveTextContent(/new line/i);
+    });
+
+    it('opens a collapsed receipt when the line printed among the earlier days', () => {
+      const month = lines('2026-11-12', 8, 'n').concat(lines('2026-11-02', 1, 'old'));
+      renderReceipt(month, { fresh: { id: 'old0', n: 1 } });
+      expect(screen.getByText('old item 0')).toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /show/i })).not.toBeInTheDocument();
     });
   });
 });

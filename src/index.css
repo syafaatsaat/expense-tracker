@@ -22,6 +22,14 @@
   --color-locked-on-ink: #6f6a58;
   /* Square-dot leader on receipt lines. */
   --color-leader: #8c846c;
+  /* Canvas-only shades: the just-printed line, disabled keycaps, the danger keycap's
+     side, and locked (future) days on the paper calendar. */
+  --color-highlight: #d8cfb3;
+  --color-disabled: #8c866f;
+  --color-disabled-ink: #3a372f;
+  --color-danger-side: #6e2418;
+  --color-locked-on-paper: #a39a80;
+  --color-locked-edge: #cfc6ab;
 
   --font-pixel: 'Silkscreen', ui-monospace, monospace;
   --font-receipt: 'VT323', ui-monospace, monospace;
@@ -32,10 +40,16 @@
   --text-pixel-16: 16px;
   --text-pixel-16--line-height: 16px;
   /* VT323: lines and body, then big totals. */
+  --text-entry: 24px;
+  --text-entry--line-height: 1;
   --text-line: 20px;
   --text-line--line-height: 1;
+  --text-keypad: 30px;
+  --text-keypad--line-height: 1;
   --text-footer: 28px;
   --text-footer--line-height: 1;
+  --text-amount: 44px;
+  --text-amount--line-height: 0.9;
   --text-total: 48px;
   --text-total--line-height: 0.9;
   --text-total-lg: 52px;
@@ -94,5 +108,99 @@
   .leader {
     height: 2px;
     background: repeating-linear-gradient(90deg, var(--color-leader) 0 2px, transparent 2px 6px);
+  }
+
+  /* Paper panel for sheets and dialogs: 3px ink border and a hard shadow below. */
+  .paper-panel {
+    --focus-ring: var(--color-red);
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    box-shadow:
+      0 -3px 0 0 var(--color-ink),
+      0 3px 0 0 var(--color-ink),
+      -3px 0 0 0 var(--color-ink),
+      3px 0 0 0 var(--color-ink),
+      0 9px 0 0 rgb(0 0 0 / 0.35);
+  }
+
+  /* Keycap: a face with a 3px outline and a darker side below. Held or selected, the side
+     shrinks to 2px and the face drops 4px. Colours come from the variant classes. */
+  .keycap {
+    --d: 6px;
+    position: relative;
+    cursor: pointer;
+    box-shadow:
+      0 -3px 0 0 var(--bd),
+      -3px 0 0 0 var(--bd),
+      3px 0 0 0 var(--bd),
+      0 var(--d) 0 0 var(--side),
+      -3px var(--d) 0 0 var(--bd),
+      3px var(--d) 0 0 var(--bd),
+      0 calc(var(--d) + 3px) 0 0 var(--bd);
+    transition:
+      transform 80ms steps(2),
+      box-shadow 80ms steps(2);
+  }
+  .keycap:active:not([aria-disabled='true']),
+  .keycap[aria-pressed='true'] {
+    --d: 2px;
+    transform: translateY(4px);
+  }
+  .keycap[aria-disabled='true'] {
+    cursor: not-allowed;
+    box-shadow: 0 0 0 3px var(--color-ink-edge);
+    transform: none;
+  }
+
+  .caret {
+    animation: caret-blink 1s steps(1) infinite;
+  }
+
+  /* A printed line: the receipt feeds down 28px in 7 steps, then the new line is revealed
+     top to bottom in 4. */
+  .paper-feed {
+    animation: paper-feed 560ms steps(7) both;
+  }
+  .print-in {
+    animation: print-in 560ms steps(4) 120ms both;
+  }
+
+  dialog.sheet::backdrop {
+    background: rgb(20 19 16 / 0.72);
+  }
+  dialog.centre::backdrop {
+    background: rgb(20 19 16 / 0.78);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .keycap {
+      transition: none;
+    }
+    .caret,
+    .paper-feed,
+    .print-in {
+      animation: none;
+    }
+  }
+}
+
+@keyframes caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes paper-feed {
+  from {
+    transform: translateY(-28px);
+  }
+}
+
+@keyframes print-in {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0);
   }
 }
