@@ -1,4 +1,5 @@
 import { CATEGORIES, getCategory, isSpendingCategory } from './categories.ts';
+import { PIXEL_BITMAPS } from '../ui/pixelBitmaps.ts';
 import { CATEGORY_IDS } from './types.ts';
 
 // WCAG 2.x relative luminance and contrast ratio, for checking the palette.
@@ -39,8 +40,45 @@ describe('CATEGORIES', () => {
     expect(CATEGORIES.map((c) => c.id)).toEqual([...CATEGORY_IDS]);
   });
 
-  it('gives every category a non-empty icon name', () => {
-    for (const c of CATEGORIES) expect(c.icon).toMatch(/^[a-z-]+$/);
+  it('gives every category a 9x9 pixel icon that exists', () => {
+    for (const c of CATEGORIES) {
+      const bitmap: readonly string[] = PIXEL_BITMAPS[c.icon];
+      expect(bitmap).toHaveLength(9);
+      for (const row of bitmap) expect(row).toHaveLength(9);
+    }
+  });
+
+  it('gives every category a unique two-letter code and a short key name', () => {
+    expect(CATEGORIES.map((c) => c.code)).toEqual([
+      'HS',
+      'UT',
+      'FD',
+      'TR',
+      'HC',
+      'SV',
+      'PC',
+      'IN',
+      'DL',
+      'EN',
+      'OT',
+    ]);
+    expect(CATEGORIES.map((c) => c.shortName)).toEqual([
+      'HOUSING',
+      'UTILITY',
+      'FOOD',
+      'TRANSPORT',
+      'HEALTH',
+      'SAVINGS',
+      'CARE',
+      'INSURE',
+      'DEBTS',
+      'LEISURE',
+      'OTHER',
+    ]);
+  });
+
+  it('gives every category a different icon', () => {
+    expect(new Set(CATEGORIES.map((c) => c.icon)).size).toBe(CATEGORIES.length);
   });
 
   it.each(CATEGORIES.map((c) => [c.name, c] as const))(
