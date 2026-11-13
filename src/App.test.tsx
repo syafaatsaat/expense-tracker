@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import App from './App.tsx';
 import type { LoadResult } from './storage/repository.ts';
@@ -19,21 +19,24 @@ function renderApp(result: LoadResult) {
   return userEvent.setup();
 }
 
+// The header and the receipt footer both print the month's total, so scope total checks.
+const header = () => within(screen.getByRole('banner'));
+
 describe('App', () => {
   it('shows the current month and its totals once data has loaded', async () => {
     renderApp({ status: 'ready', root, seeded: false, persistent: true });
     expect(screen.getByText('November 2026')).toBeInTheDocument();
-    expect(await screen.findByText('S$12.50')).toBeInTheDocument();
+    expect(await header().findByText('S$12.50')).toBeInTheDocument();
     expect(screen.getByText('SAVED 500.00')).toBeInTheDocument();
   });
 
   it('switches month and recomputes the totals', async () => {
     const user = renderApp({ status: 'ready', root, seeded: false, persistent: true });
-    await screen.findByText('S$12.50');
+    await header().findByText('S$12.50');
     await user.click(screen.getByRole('button', { name: 'Previous month' }));
     expect(screen.getByText('October 2026')).toBeInTheDocument();
     expect(screen.getByText('SPENT IN OCT')).toBeInTheDocument();
-    expect(screen.getByText('S$30.00')).toBeInTheDocument();
+    expect(header().getByText('S$30.00')).toBeInTheDocument();
     expect(screen.getByText('SAVED 0.00')).toBeInTheDocument();
   });
 
@@ -48,6 +51,22 @@ describe('App', () => {
   it('warns when changes will not be kept', async () => {
     renderApp({ status: 'ready', root, seeded: true, persistent: false });
     expect(await screen.findByText(/this browser isn't saving changes/i)).toBeInTheDocument();
+  });
+
+  it('prints the month on the receipt', async () => {
+    renderApp({ status: 'ready', root, seeded: false, persistent: true });
+    const receipt = await screen.findByRole('region', { name: 'Receipt, November 2026' });
+    expect(receipt).toHaveTextContent('S$12.50');
+  });
+
+  it('tears off a past month and goes back to the current one', async () => {
+    const user = renderApp({ status: 'ready', root, seeded: false, persistent: true });
+    await header().findByText('S$12.50');
+    await user.click(screen.getByRole('button', { name: 'Previous month' }));
+    expect(screen.getByText('CLOSED')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: /back to nov/i }));
+    expect(screen.getByText('November 2026')).toBeInTheDocument();
+    expect(screen.queryByText('CLOSED')).not.toBeInTheDocument();
   });
 
   it('has a main landmark for the receipt', () => {

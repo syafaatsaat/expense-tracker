@@ -27,23 +27,27 @@ export type CategoryId = (typeof CATEGORY_IDS)[number];
 /** `saving` categories are left out of spending totals, breakdowns and budgets. */
 export type CategoryKind = 'spending' | 'saving';
 
-/** Icon names; the UI maps each one to an inline SVG. */
+/** Pixel icon names; each has a 9x9 bitmap in src/ui/pixelBitmaps.ts. */
 export type CategoryIcon =
-  | 'home'
+  | 'house'
   | 'bolt'
-  | 'utensils'
-  | 'car'
-  | 'heart-pulse'
-  | 'piggy-bank'
-  | 'sparkles'
+  | 'bowl'
+  | 'bus'
+  | 'cross'
+  | 'coins'
+  | 'scissors'
   | 'shield'
-  | 'credit-card'
-  | 'film'
-  | 'tag';
+  | 'card'
+  | 'star'
+  | 'dots';
 
 export interface Category {
   id: CategoryId;
   name: string;
+  /** Two-letter department code printed on keys, e.g. "FD". */
+  code: string;
+  /** Key label, e.g. "FOOD". */
+  shortName: string;
   kind: CategoryKind;
   /** Swatch colours only, never text colours. Light theme on white, dark on slate-900. */
   colour: { light: string; dark: string };
