@@ -21,7 +21,7 @@ describe('parseAmount', () => {
     ['$12.50', 1250],
     ['S$12.50', 1250],
     ['007.10', 710],
-    ['999999.99', 99999999],
+    ['99999.99', 9999999],
   ])('parses %j to %i cents', (input, cents) => {
     expect(parseAmount(input)).toEqual({ ok: true, cents });
   });
@@ -52,11 +52,16 @@ describe('parseAmount', () => {
     ['0.00', 'not-positive'],
     ['-5', 'not-positive'],
     ['-0', 'not-positive'],
+    ['100000', 'too-large'],
+    ['100,000.00', 'too-large'],
     ['1000000', 'too-large'],
-    ['1,000,000.00', 'too-large'],
     ['99999999999999999999', 'too-large'],
   ])('rejects %j as %s', (input, error) => {
     expect(parseAmount(input)).toEqual({ ok: false, error });
+  });
+
+  it('caps amounts at S$99,999.99, the seven digits a till holds', () => {
+    expect(MAX_AMOUNT_CENTS).toBe(9_999_999);
   });
 
   it('accepts exactly the cap and rejects one cent above it', () => {
@@ -116,7 +121,7 @@ describe('centsToDecimalString', () => {
   });
 
   it('round-trips through parseAmount', () => {
-    for (const cents of [1, 99, 100, 101, 4350, 99999999]) {
+    for (const cents of [1, 99, 100, 101, 4350, 9999999]) {
       expect(parseAmount(centsToDecimalString(cents))).toEqual({ ok: true, cents });
     }
   });

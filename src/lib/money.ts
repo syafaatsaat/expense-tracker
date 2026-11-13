@@ -1,7 +1,7 @@
 import { CURRENCY, CURRENCY_SYMBOL, LOCALE } from '../config.ts';
 
-/** Largest accepted amount: $999,999.99. */
-export const MAX_AMOUNT_CENTS = 99_999_999;
+/** Largest accepted amount: S$99,999.99, the seven digits the till keypad holds. */
+export const MAX_AMOUNT_CENTS = 9_999_999;
 
 export type AmountError = 'empty' | 'invalid' | 'too-many-decimals' | 'not-positive' | 'too-large';
 

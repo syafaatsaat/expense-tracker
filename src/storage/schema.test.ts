@@ -55,7 +55,7 @@ describe('validateRoot', () => {
     ],
     [
       'an amount above the cap',
-      breakAt((r) => (r.expenses[0].amountCents = 1e12)),
+      breakAt((r) => (r.expenses[0].amountCents = 10_000_000)),
       'expenses[0].amountCents',
     ],
     [
